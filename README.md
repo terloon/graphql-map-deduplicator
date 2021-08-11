@@ -1,12 +1,14 @@
 # graphql-map-deduplicator
 
-This will generate a map for every entity that has a __typename and id and place them under a property named `__map__`. Entities without those properties are left in place.
+`mapit()` will deduplicate graphql responses by generating a map of every entity that has `__typename` and `id` properties. It will pull those out and place them into a new root property `__map__` of the response. Entities without those properties are left in place.
 
-Example usage on an Apollo server would be:
+`unmapit()` will remove the `__map__` property and place them back into data object.
+
+Server example:
 
 ```javascript
 formatResponse: (response, context) => {
-  if (context.request.http?.headers.get('gql-deduplication') === 'true') {
+  if (context.request.http?.headers.get('gql-map-dedupe') === 'true') {
     response.data = mapit(response.data || {})
     return response
   }
