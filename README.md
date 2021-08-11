@@ -1,115 +1,21 @@
-# graphql map deduplicator
+# graphql-map-deduplicator
 
-This will generate a map for every entity that has a __typename and id.
+This will generate a map for every entity that has a __typename and id and place them under a property named `__map__`. Entities without those properties are left in place.
 
-For example:
+Example usage on an Apollo server would be:
 
-    {
-        "__typename": "thing",
-        "id": "a",
-        "data": [
-            {
-                "__typename": "foo",
-                "id": "a",
-                "propertyA": 123,
-                "propertyB": "hello",
-                "bar": {
-                    "__typename": "bar",
-                    "id": "a",
-                    "propertyA": 1,
-                    "propertyB": 2,
-                    "propertyC": 3,
-                    "propertyD": 4
-                }
-            },
-            {
-                "__typename": "foo",
-                "id": "b",
-                "propertyA": 234,
-                "propertyB": "world",
-                "bar": {
-                    "__typename": "bar",
-                    "id": "a",
-                    "propertyA": 1,
-                    "propertyB": 2,
-                    "propertyC": 3,
-                    "propertyD": 4
-                }
-            },
-            {
-                "__typename": "foo",
-                "id": "c",
-                "propertyA": 456,
-                "propertyB": "!",
-                "bar": {
-                    "__typename": "bar",
-                    "id": "a",
-                    "propertyA": 1,
-                    "propertyB": 2,
-                    "propertyC": 3,
-                    "propertyD": 4
-                }
-            }
-        ]
-    }    
+```javascript
+formatResponse: (response, context) => {
+  if (context.request.http?.headers.get('gql-deduplication') === 'true') {
+    response.data = mapit(response.data || {})
+    return response
+  }
+  return null
+}
+```
 
-Will become:
+Client example:
 
-    {
-        "__typename": "thing",
-        "id": "a",
-        "__map__": {
-            "bar": {
-                "a": {
-                    "propertyA": 1,
-                    "propertyB": 2,
-                    "propertyC": 3,
-                    "propertyD": 4
-                }
-            },
-            "foo": {
-                "a": {
-                    "propertyA": 123,
-                    "propertyB": "hello",
-                    "bar": {
-                        "__typename": "bar",
-                        "id": "a"
-                    }
-                },
-                "b": {
-                    "propertyA": 234,
-                    "propertyB": "world",
-                    "bar": {
-                        "__typename": "bar",
-                        "id": "a"
-                    }
-                },
-                "c": {
-                    "propertyA": 456,
-                    "propertyB": "!",
-                    "bar": {
-                        "__typename": "bar",
-                        "id": "a"
-                    }
-                }
-            },
-            "thing": {
-                "a": {
-                    "data": [
-                        {
-                            "__typename": "foo",
-                            "id": "a"
-                        },
-                        {
-                            "__typename": "foo",
-                            "id": "b"
-                        },
-                        {
-                            "__typename": "foo",
-                            "id": "c"
-                        }
-                    ]
-                }
-            }
-        }
-    }
+```javascript
+const data = unmapit(data)
+```
