@@ -16,7 +16,7 @@ const mapit = (node: Record<string, any>, map: Record<string, any>): Record<stri
     }
     return {
       __typename: node.__typename,
-      id: node.id,
+      id: node.id
     }
   }
   return node
@@ -26,6 +26,6 @@ export default (node: Object) => {
   const map = {}
   return {
     __map__: map,
-    ...mapit(node, map),
+    ...mapit(node, map)
   }
 }

@@ -49,14 +49,16 @@ test('mapit', () => {
       },
     ],
   }
+  const thing2 = JSON.parse(JSON.stringify(thing))
 
   const resultA = mapit(thing)
-  expect(resultA).toBeDefined()
-  const jsonA = JSON.stringify(resultA)
+  expect(resultA).toBeDefined()  
 
   const resultB = unmapit(resultA)
-  expect(resultB).toBeDefined()
-  const jsonB = JSON.stringify(resultB)
-
+  expect(resultB).toBeDefined()      
   expect(resultB).toEqual(thing)
+
+  const fooResult = mapit(thing2)
+  const resultC = unmapit(fooResult, {inMemory: true})
+  expect(resultC.data[0].bar).toEqual(resultB.data[0].bar)
 })
